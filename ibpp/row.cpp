@@ -87,7 +87,7 @@ void RowImpl::Set(int param, const void* bindata, int len)
 		throw LogicExceptionImpl("Row::Set[void*]", _("null char* pointer detected."));
 	if (len < 0)
 		throw LogicExceptionImpl("Row::Set[void*]", _("Length must be >= 0"));
-		
+
 	SetValue(param, ivByte, bindata, len);
 	mUpdated[param-1] = true;
 }
@@ -105,7 +105,7 @@ void RowImpl::Set(int param, int16_t value)
 {
 	if (mDescrArea == 0)
 		throw LogicExceptionImpl("Row::Set[int16_t]", _("The row is not initialized."));
-											
+
 	SetValue(param, ivInt16, &value);
 	mUpdated[param-1] = true;
 }
@@ -841,7 +841,7 @@ void RowImpl::SetValue(int varnum, IITYPE ivType, const void* value, int userlen
 				while (len < var->sqllen) var->sqldata[len++] = ' ';
 			}
 			else throw WrongTypeImpl("RowImpl::SetValue", var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (1)."));
 			break;
 
 		case SQL_VARYING :
@@ -865,7 +865,7 @@ void RowImpl::SetValue(int varnum, IITYPE ivType, const void* value, int userlen
 				var->sqldata[2] = *(bool*)value ? 'T' : 'F';
 			}
 			else throw WrongTypeImpl("RowImpl::SetValue", var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (2)."));
 			break;
 
 		case SQL_SHORT :
@@ -906,7 +906,7 @@ void RowImpl::SetValue(int varnum, IITYPE ivType, const void* value, int userlen
 					(int16_t)floor(*(double*)value * multiplier + 0.5);
 			}
 			else throw WrongTypeImpl("RowImpl::SetValue",  var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (3)."));
 			break;
 
 		case SQL_LONG :
@@ -944,7 +944,7 @@ void RowImpl::SetValue(int varnum, IITYPE ivType, const void* value, int userlen
 					(ISC_LONG)floor(*(double*)value * multiplier + 0.5);
 			}
 			else throw WrongTypeImpl("RowImpl::SetValue",  var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (4)."));
 			break;
 
 		case SQL_INT64 :
@@ -979,20 +979,20 @@ void RowImpl::SetValue(int varnum, IITYPE ivType, const void* value, int userlen
 					(int64_t)floor(*(double*)value * multiplier + 0.5);
 			}
 			else throw WrongTypeImpl("RowImpl::SetValue", var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (5)."));
 			break;
 
 		case SQL_FLOAT :
 			if (ivType != ivFloat || var->sqlscale != 0)
 				throw WrongTypeImpl("RowImpl::SetValue", var->sqltype, ivType,
-									_("Incompatible types."));
+									_("Incompatible types (6)."));
 			*(float*)var->sqldata = *(float*)value;
 			break;
 
 		case SQL_DOUBLE :
 			if (ivType != ivDouble)
 				throw WrongTypeImpl("RowImpl::SetValue", var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (7)."));
 			if (var->sqlscale != 0)
 			{
 				// Round to scale of NUMERIC(x,y)
@@ -1006,21 +1006,21 @@ void RowImpl::SetValue(int varnum, IITYPE ivType, const void* value, int userlen
 		case SQL_TIMESTAMP :
 			if (ivType != ivTimestamp)
 				throw WrongTypeImpl("RowImpl::SetValue", var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (8)."));
 			encodeTimestamp(*(ISC_TIMESTAMP*)var->sqldata, *(IBPP::Timestamp*)value);
 			break;
 
 		case SQL_TYPE_DATE :
 			if (ivType != ivDate)
 				throw WrongTypeImpl("RowImpl::SetValue", var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (9)."));
 			encodeDate(*(ISC_DATE*)var->sqldata, *(IBPP::Date*)value);
 			break;
 
 		case SQL_TYPE_TIME :
 			if (ivType != ivTime)
 				throw WrongTypeImpl("RowImpl::SetValue", var->sqltype, ivType,
-											_("Incompatible types."));
+											_("Incompatible types (10)."));
 			encodeTime(*(ISC_TIME*)var->sqldata, *(IBPP::Time*)value);
 			break;
 
@@ -1037,13 +1037,13 @@ void RowImpl::SetValue(int varnum, IITYPE ivType, const void* value, int userlen
 				blob.GetId((ISC_QUAD*)var->sqldata);
 			}
 			else throw WrongTypeImpl("RowImpl::SetValue", var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (11)."));
 			break;
 
 		case SQL_ARRAY :
 			if (ivType != ivArray)
 				throw WrongTypeImpl("RowImpl::SetValue", var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (12)."));
 			{
 				ArrayImpl* array = (ArrayImpl*)value;
 				array->GetId((ISC_QUAD*)var->sqldata);
@@ -1111,7 +1111,7 @@ void* RowImpl::GetValue(int varnum, IITYPE ivType, void* retvalue)
 				value = &mBools[varnum-1];
 			}
 			else throw WrongTypeImpl("RowImpl::GetValue", var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (13)."));
 			break;
 
 		case SQL_VARYING :
@@ -1144,7 +1144,7 @@ void* RowImpl::GetValue(int varnum, IITYPE ivType, void* retvalue)
 				value = &mBools[varnum-1];
 			}
 			else throw WrongTypeImpl("RowImpl::GetValue", var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (14)."));
 			break;
 
 		case SQL_SHORT :
@@ -1184,7 +1184,7 @@ void* RowImpl::GetValue(int varnum, IITYPE ivType, void* retvalue)
 				value = &mNumerics[varnum-1];
 			}
 			else throw WrongTypeImpl("RowImpl::GetValue", var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (15)."));
 			break;
 
 		case SQL_LONG :
@@ -1227,7 +1227,7 @@ void* RowImpl::GetValue(int varnum, IITYPE ivType, void* retvalue)
 				value = &mNumerics[varnum-1];
 			}
 			else throw WrongTypeImpl("RowImpl::GetValue", var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (16)."));
 			break;
 
 		case SQL_INT64 :
@@ -1274,20 +1274,20 @@ void* RowImpl::GetValue(int varnum, IITYPE ivType, void* retvalue)
 				value = &mNumerics[varnum-1];
 			}
 			else throw WrongTypeImpl("RowImpl::GetValue", var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (17)."));
 			break;
 
 		case SQL_FLOAT :
 			if (ivType != ivFloat)
 				throw WrongTypeImpl("RowImpl::GetValue", var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (18)."));
 			value = var->sqldata;
 			break;
 
 		case SQL_DOUBLE :
 			if (ivType != ivDouble)
 				throw WrongTypeImpl("RowImpl::GetValue", var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (19)."));
 			if (var->sqlscale != 0)
 			{
 				// Round to scale y of NUMERIC(x,y)
@@ -1302,7 +1302,7 @@ void* RowImpl::GetValue(int varnum, IITYPE ivType, void* retvalue)
 		case SQL_TIMESTAMP :
 			if (ivType != ivTimestamp)
 				throw WrongTypeImpl("RowImpl::SetValue", var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (20)."));
 			decodeTimestamp(*(IBPP::Timestamp*)retvalue, *(ISC_TIMESTAMP*)var->sqldata);
 			value = retvalue;
 			break;
@@ -1310,7 +1310,7 @@ void* RowImpl::GetValue(int varnum, IITYPE ivType, void* retvalue)
 		case SQL_TYPE_DATE :
 			if (ivType != ivDate)
 				throw WrongTypeImpl("RowImpl::SetValue", var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (21)."));
 			decodeDate(*(IBPP::Date*)retvalue, *(ISC_DATE*)var->sqldata);
 			value = retvalue;
 			break;
@@ -1318,7 +1318,7 @@ void* RowImpl::GetValue(int varnum, IITYPE ivType, void* retvalue)
 		case SQL_TYPE_TIME :
 			if (ivType != ivTime)
 				throw WrongTypeImpl("RowImpl::SetValue", var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (22)."));
 			decodeTime(*(IBPP::Time*)retvalue, *(ISC_TIME*)var->sqldata);
 			value = retvalue;
 			break;
@@ -1339,13 +1339,13 @@ void* RowImpl::GetValue(int varnum, IITYPE ivType, void* retvalue)
 				value = retvalue;
 			}
 			else throw WrongTypeImpl("RowImpl::GetValue", var->sqltype, ivType,
-										_("Incompatible types."));
+										_("Incompatible types (23)."));
 			break;
-			
+
 		case SQL_ARRAY :
 			if (ivType != ivArray)
 				throw WrongTypeImpl("RowImpl::GetValue", var->sqltype, ivType,
-											_("Incompatible types."));
+											_("Incompatible types (24)."));
 			{
 				ArrayImpl* array = (ArrayImpl*)retvalue;
 				array->SetId((ISC_QUAD*)var->sqldata);
@@ -1548,7 +1548,7 @@ RowImpl& RowImpl::operator=(const RowImpl& copied)
 	mDialect = copied.mDialect;
 	mDatabase = copied.mDatabase;
 	mTransaction = copied.mTransaction;
-	
+
 	return *this;
 }
 

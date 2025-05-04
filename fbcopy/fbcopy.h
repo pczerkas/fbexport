@@ -79,6 +79,7 @@ private:
     std::string params(const std::string& fieldlist);
     bool copyData(IBPP::Statement& st1, IBPP::Statement& st2, int srccol, int destcol);
     bool copyBlob(IBPP::Statement& st1, IBPP::Statement& st2, int col);
+    int cmpBlobs(IBPP::Statement& st1, IBPP::Statement& st2, int col);
     std::string getDatatype(IBPP::Statement& st1, std::string table, std::string fieldname, bool not_nulls = true);
 
 public:
@@ -86,4 +87,3 @@ public:
 };
 
 #endif
-

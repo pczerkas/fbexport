@@ -44,6 +44,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <stdlib.h>
 #include <time.h>
 #include <ctype.h>
+#include <string.h>
 
 #include <string>
 #include <sstream>
@@ -507,7 +508,7 @@ string createHumanString(IBPP::Statement& st, int col, bool& numeric)
             value = str;
             break;
         case IBPP::sdFloat:
-            st->Get(col, &fval);            
+            st->Get(col, &fval);
             snprintf(str,30,"%19g",fval);
             value = str;
             numeric = true;
@@ -527,7 +528,7 @@ string createHumanString(IBPP::Statement& st, int col, bool& numeric)
             break;
 
         default:
-            fprintf(stderr, "WARNING: Datatype not supported! Column: %s\n",
+            fprintf(stderr, "WARNING: Datatype not supported (1)! Column: %s\n",
                 st->ColumnName(col));
     };
     return value;
@@ -832,9 +833,9 @@ int FBCopy::compareGenerators(IBPP::Transaction tr1, IBPP::Transaction tr2)
         st2->Set(1, s);
         st2->Execute();
         bool has = st2->Fetch();
-        if (ar->Operation == opSingle) 
+        if (ar->Operation == opSingle)
         {
-            if(has) 
+            if(has)
             {
                 copyGeneratorValues(s.c_str(), s.c_str());
             }
@@ -1209,8 +1210,6 @@ int FBCopy::cmpData(IBPP::Statement& st1, IBPP::Statement& st2, int col)
     IBPP::Timestamp ts, ts2;
 
     IBPP::SDT DataType = st1->ColumnType(col);
-    if (st1->ColumnScale(col)) // FIXME: IBPP has to be changed, this is only a hack
-        DataType = IBPP::sdDouble;
 
     //if (DataType == IBPP::sdDate && Dialect == 1)
     //DataType = IBPP::sdTimestamp;
@@ -1254,10 +1253,10 @@ int FBCopy::cmpData(IBPP::Statement& st1, IBPP::Statement& st2, int col)
             st2->Get(col, int64val2);
             return cmpval(int64val, int64val2);
         case IBPP::sdBlob:
-        //    return 0;   // FIXME: copyBlob(st1, st2, col);
+            return cmpBlobs(st1, st2, col);
 
         default:
-            fprintf(stderr, "WARNING: Datatype not supported! Column: %s\n",
+            fprintf(stderr, "WARNING: Datatype not supported (2)! Column: %s\n",
                 st1->ColumnName(col));
             return 0;
     };
@@ -1330,7 +1329,7 @@ bool FBCopy::copyData(IBPP::Statement& st1, IBPP::Statement& st2, int srccol,
                 return copyBlob(st1, st2, srccol);  // blob cannot be PK
 
             default:
-                fprintf(stderr, "WARNING: Datatype not supported! Column: %s\n",
+                fprintf(stderr, "WARNING: Datatype not supported (3)! Column: %s\n",
                     st1->ColumnName(srccol));
                 st2->SetNull(destcol);
         };
@@ -1364,6 +1363,34 @@ bool FBCopy::copyBlob(IBPP::Statement& st1, IBPP::Statement& st2, int col)
     b2->Close();
     st2->Set(col, b2);
     return true;
+}
+
+int FBCopy::cmpBlobs(IBPP::Statement& st1, IBPP::Statement& st2, int col)
+{
+    IBPP::Blob b1 = IBPP::BlobFactory(st1->DatabasePtr(), st1->TransactionPtr());
+    IBPP::Blob b2 = IBPP::BlobFactory(st2->DatabasePtr(), st2->TransactionPtr());
+    st1->Get(col, b1);
+    b1->Open();
+    st2->Get(col, b2);
+    b2->Open();
+
+    unsigned char buffer1[8192];     // 8K block
+    unsigned char buffer2[8192];     // 8K block
+    while (true)
+    {
+        int size1 = b1->Read(buffer1, 8192);
+        int size2 = b2->Read(buffer2, 8192);
+        if (size1 != size2)
+            return 1;
+        if (memcmp(buffer1, buffer2, size1) != 0) {
+            return 1;
+        }
+        if (size1 <= 0 || size2 <= 0)
+            break;
+    }
+    b1->Close();
+    b2->Close();
+    return 0;
 }
 
 bool FBCopy::connect(IBPP::Database& db1, DatabaseInfo d)

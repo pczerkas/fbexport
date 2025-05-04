@@ -330,13 +330,13 @@ string FBExport::CreateHumanString(IBPP::Statement& st, int col)
             value = GetHumanTimestamp(ts);
             break;
         case IBPP::sdFloat:
-            st->Get(col, &fval);            
+            st->Get(col, &fval);
             snprintf(str,30,"%19g",fval);
             value = str;
             numeric = true;
             break;
         case IBPP::sdDouble:
-            st->Get(col, &dval);            
+            st->Get(col, &dval);
             snprintf(str,30,"%19g",dval);
             value = str;
             numeric = true;
@@ -447,7 +447,7 @@ bool FBExport::CreateString(IBPP::Statement& st, int col, string &value)
             value = str;
             return true;
         case IBPP::sdDouble:
-            st->Get(col, &dval);            
+            st->Get(col, &dval);
             snprintf(str,30,"%19g",dval);
             value = str;
             return true;
